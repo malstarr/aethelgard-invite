@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aethelgard: you are invited</title>
+<style>
+  body { margin:0; font-family: system-ui, sans-serif; background:#1b1b26; color:#fff;
+         display:flex; min-height:100vh; align-items:center; justify-content:center; text-align:center; }
+  main { max-width:420px; padding:24px; }
+  h1 { font-size:26px; margin:0 0 8px; }
+  p { color:#cfcfe0; line-height:1.4; }
+  a.btn { display:block; margin:12px 0; padding:14px; border-radius:12px; background:#ffd54f;
+          color:#000; font-weight:bold; text-decoration:none; }
+  a.alt { background:#3b3b55; color:#fff; }
+  .hide { display:none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>You are invited to Aethelgard!</h1>
+  <p id="msg">Opening the game...</p>
+  <a id="open" class="btn" href="#">Open the game</a>
+  <div id="store" class="hide">
+    <p>Do not have the game yet? The first part is free to try.</p>
+    <a id="play" class="btn alt" href="https://play.google.com/store/apps/details?id=com.aethelgard.game">Get it on Google Play</a>
+    <a id="apple" class="btn alt" href="#">Get it on the App Store</a>
+  </div>
+</main>
+<script>
+  // ONE PLACE TO EDIT: the iPhone link. Use the TestFlight public link while the
+  // game is in testing, and the App Store link once it is released.
+  var IOS_URL = "";
+
+  var code = new URLSearchParams(location.search).get("c") || "";
+  var appLink = "monsterchallenge://link?c=" + encodeURIComponent(code);
+  var ua = navigator.userAgent || "";
+  var isAndroid = /Android/i.test(ua);
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+  document.getElementById("open").href = appLink;
+  if (IOS_URL) document.getElementById("apple").href = IOS_URL;
+  else document.getElementById("apple").classList.add("hide");
+  if (isIOS) document.getElementById("play").classList.add("hide");
+  if (isAndroid) document.getElementById("apple").classList.add("hide");
+
+  function showStore() {
+    document.getElementById("msg").textContent =
+      "If the game did not open, you can get it here.";
+    document.getElementById("store").classList.remove("hide");
+  }
+
+  if (code) {
+    var t = Date.now();
+    window.location.href = appLink;
+    // If the game opened, this page is hidden. If still visible, it is not installed.
+    setTimeout(function () {
+      if (!document.hidden && Date.now() - t < 4000) {
+        showStore();
+        if (isAndroid) window.location.href = document.getElementById("play").href;
+        else if (isIOS && IOS_URL) window.location.href = IOS_URL;
+      }
+    }, 1800);
+  } else {
+    document.getElementById("msg").textContent = "This invite link is missing its code.";
+    showStore();
+  }
+</script>
+</body>
+</html>
